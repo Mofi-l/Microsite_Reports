@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MS Leadership Dashboard - Comprehensive project management and analytics dashboard">
+    <title>MS Leadership Dashboard</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Date Range Picker dependencies -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header-content">
+            <h1>MS Leadership Dashboard</h1>
+            <div class="time-controls">
+                <div class="timeframe-wrapper">
+                    <label for="timeframe-select">Select Timeframe:</label>
+                    <select id="timeframe-select" aria-label="Select time period">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="biweekly">Biweekly</option>
+                        <option value="monthly" selected>Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="ytd">YTD</option>
+                    </select>
+                </div>
+                <div class="daterange-wrapper">
+                    <label for="daterange">Custom Date Range:</label>
+                    <input type="text" id="daterange" name="daterange" aria-label="Select date range" />
+                </div>
+                <button id="refresh-data" aria-label="Refresh dashboard data">
+                    <span class="refresh-icon">↻</span>
+                    Refresh Data
+                </button>
+                <button id="export-data" aria-label="Export dashboard data">
+                    <span class="export-icon">⤓</span>
+                    Export
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav" aria-label="Main navigation">
+        <ul>
+            <li><a href="#" class="active" data-tab="planning" aria-current="page">Planning Overview</a></li>
+            <li><a href="#" data-tab="productivity">Productivity Metrics</a></li>
+            <li><a href="#" data-tab="program">Program Analytics</a></li>
+            <li><a href="#" data-tab="quality">Quality Metrics</a></li>
+        </ul>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <main>
+        <!-- Planning Overview Tab -->
+        <section id="planning" class="dashboard-tab active" aria-label="Planning Overview">
+            <div class="metrics-grid">
+                <div class="metric-card" id="project-volume">
+                    <h3>Project Volume</h3>
+                    <div class="chart-container">
+                        <canvas id="projectVolumeChart" aria-label="Project volume chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">Total Projects</span>
+                            <span class="metric-value" id="total-projects">0</span>
+                            <span class="metric-trend positive">+5%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Active Projects</span>
+                            <span class="metric-value" id="active-projects">0</span>
+                            <span class="metric-trend negative">-2%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Completed Projects</span>
+                            <span class="metric-value" id="completed-projects">0</span>
+                            <span class="metric-trend positive">+8%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="turnaround-times">
+                    <h3>Turnaround Times</h3>
+                    <div class="chart-container">
+                        <canvas id="tatChart" aria-label="Turnaround times chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">Avg TAT</span>
+                            <span class="metric-value" id="avg-tat">0</span>
+                            <span class="metric-unit">days</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Fastest TAT</span>
+                            <span class="metric-value" id="min-tat">0</span>
+                            <span class="metric-unit">days</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Longest TAT</span>
+                            <span class="metric-value" id="max-tat">0</span>
+                            <span class="metric-unit">days</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="status-overview">
+                    <h3>Status Overview</h3>
+                    <div class="chart-container">
+                        <canvas id="statusChart" aria-label="Project status chart"></canvas>
+                    </div>
+                    <div class="status-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #28a745"></span>
+                            <span class="legend-label">On Track</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #ffc107"></span>
+                            <span class="legend-label">At Risk</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #dc3545"></span>
+                            <span class="legend-label">Delayed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Productivity Metrics Tab -->
+        <section id="productivity" class="dashboard-tab" aria-label="Productivity Metrics">
+            <div class="metrics-grid">
+                <div class="metric-card" id="execution-metrics">
+                    <h3>Execution Metrics</h3>
+                    <div class="chart-container">
+                        <canvas id="executionChart" aria-label="Execution metrics chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">Execution Rate</span>
+                            <span class="metric-value" id="execution-rate">0%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Efficiency Score</span>
+                            <span class="metric-value" id="efficiency-score">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="timeline-analytics">
+                    <h3>Timeline Analytics</h3>
+                    <div class="chart-container">
+                        <canvas id="timelineChart" aria-label="Timeline analytics chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">On-Time Delivery</span>
+                            <span class="metric-value" id="ontime-delivery">0%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Avg Delay</span>
+                            <span class="metric-value" id="avg-delay">0</span>
+                            <span class="metric-unit">days</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="resource-utilization">
+                    <h3>Resource Utilization</h3>
+                    <div class="chart-container">
+                        <canvas id="resourceChart" aria-label="Resource utilization chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                               <span class="metric-label">Utilization Rate</span>
+                            <span class="metric-value" id="utilization-rate">0%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Capacity Used</span>
+                            <span class="metric-value" id="capacity-used">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Program Analytics Tab -->
+        <section id="program" class="dashboard-tab" aria-label="Program Analytics">
+            <div class="metrics-grid">
+                <div class="metric-card" id="project-distribution">
+                    <h3>Project Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="distributionChart" aria-label="Project distribution chart"></canvas>
+                    </div>
+                    <div class="distribution-filters">
+                        <select id="distribution-filter" aria-label="Distribution view filter">
+                            <option value="type">By Type</option>
+                            <option value="region">By Region</option>
+                            <option value="priority">By Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="geographic-analysis">
+                    <h3>Geographic Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="geoChart" aria-label="Geographic analysis chart"></canvas>
+                    </div>
+                    <div class="region-summary">
+                        <div class="region-metrics">
+                            <!-- Region metrics will be dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="trend-analysis">
+                    <h3>Trend Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="trendChart" aria-label="Trend analysis chart"></canvas>
+                    </div>
+                    <div class="trend-filters">
+                        <select id="trend-metric" aria-label="Trend metric selector">
+                            <option value="volume">Project Volume</option>
+                            <option value="performance">Performance</option>
+                            <option value="satisfaction">Satisfaction</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quality Metrics Tab -->
+        <section id="quality" class="dashboard-tab" aria-label="Quality Metrics">
+            <div class="metrics-grid">
+                <div class="metric-card" id="defect-tracking">
+                    <h3>Defect Tracking</h3>
+                    <div class="chart-container">
+                        <canvas id="defectChart" aria-label="Defect tracking chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">Critical Defects</span>
+                            <span class="metric-value" id="critical-defects">0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Major Defects</span>
+                            <span class="metric-value" id="major-defects">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="quality-scores">
+                    <h3>Quality Scores</h3>
+                    <div class="chart-container">
+                        <canvas id="qualityScoreChart" aria-label="Quality scores chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">Average Score</span>
+                            <span class="metric-value" id="avg-quality-score">0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Top Score</span>
+                            <span class="metric-value" id="top-quality-score">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="compliance-tracking">
+                    <h3>Compliance Tracking</h3>
+                    <div class="chart-container">
+                        <canvas id="complianceChart" aria-label="Compliance tracking chart"></canvas>
+                    </div>
+                    <div class="metrics-summary">
+                        <div class="metric">
+                            <span class="metric-label">Compliance Rate</span>
+                            <span class="metric-value" id="compliance-rate">0%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Violations</span>
+                            <span class="metric-value" id="compliance-violations">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>Last updated: <span id="last-updated">Loading...</span></p>
+            <p>© 2024 MS Leadership Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <p>Loading dashboard data...</p>
+    </div>
+
+    <!-- Error Message Template -->
+    <div id="error-message" class="error-toast hidden">
+        <span class="error-icon">⚠️</span>
+        <span class="error-text"></span>
+        <button class="close-error">×</button>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="dashboard.js"></script>
+</body>
+</html>
